@@ -1,0 +1,8 @@
+﻿.jstree .jstree-no-icons .jstree-checkbox { display:inline-block; }
+.jstree .jstree-no-checkboxes .jstree-checkbox { display:none !important; }
+.jstree .jstree-checked > a > .jstree-checkbox { background-position:-38px -19px; }
+.jstree .jstree-unchecked > a > .jstree-checkbox { background-position:-2px -19px; }
+.jstree .jstree-undetermined > a > .jstree-checkbox { background-position:-20px -19px; }
+.jstree .jstree-checked > a > .jstree-checkbox:hover { background-position:-38px -37px; }
+.jstree .jstree-unchecked > a > .jstree-checkbox:hover { background-position:-2px -37px; }
+.jstree .jstree-undetermined > a > .jstree-checkbox:hover { background-position:-20px -37px; }

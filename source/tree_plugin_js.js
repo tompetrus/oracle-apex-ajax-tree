@@ -9,6 +9,8 @@ function init_tree_custom(pOptions){
   initOpen     : json array with nodes to open up
   initSelect   : node id to select
   selectedItem : html element item id of element to hold selected node id
+  plugins      : array with additional plugins to load
+  pluginsConf  : configuration object for additional plugins
   themetype    :
   theme        : 
   themeurl     : 
@@ -22,6 +24,8 @@ function init_tree_custom(pOptions){
     , "initOpen"     : null
     , "initSelect"   : null
     , "selectedItem" : null
+    , "plugins"      : []
+    , "pluginsConf"  : null
     , "themetype"    : null
     , "theme"        : null
     , "themeurl"     : null
@@ -75,10 +79,41 @@ function init_tree_custom(pOptions){
     }
   };
   
-  if(!!lOptions.themetype){
-    if(lOptions.themetype == 'themeroller'){
+  // additional plugins should be loaded before the themeroller plugin
+  apex.debug("..plugins");
+  if ( lOptions.plugins.length ) {
+    // did not use concat because of necessary check
+    for ( var i = 0 ; i<lOptions.plugins.length ; i++ ) { 
+      if ( lOptions.plugins[i] !== "json_data" && lOptions.plugins[i] !== "ui" && lOptions.plugins[i] !== "search" ) {
+        lTreeConfig.plugins.push( lOptions.plugins[i] );
+      };
+    };    
+    apex.debug("Tree config plugins:");
+    apex.debug(lTreeConfig.plugins);
+    
+    apex.debug("...plugin config");
+    apex.debug("... is conf object? " + typeof lOptions.pluginsConf);
+    if ( !!lOptions.pluginsConf ) {
+      //purposefully did not do a deep copy to prevent overriding defaults
+      //should you wish to override you should implement the sources and alter them according to your needs
+      //For the same reason defaults are deleted from the custom object
+       if ( lOptions.pluginsConf.hasOwnProperty("plugins") )
+         lOptions.pluginsConf["plugins"].delete;
+      if ( lOptions.pluginsConf.hasOwnProperty("plugins") )
+        lOptions.pluginsConf["ui"].delete;
+      if ( lOptions.pluginsConf.hasOwnProperty("plugins") )
+        lOptions.pluginsConf["json_data"].delete;
+      if ( lOptions.pluginsConf.hasOwnProperty("plugins") )
+        lOptions.pluginsConf["search"].delete;
+      apex.debug(lOptions.pluginsConf);
+      $.extend(lTreeConfig, lOptions.pluginsConf);
+    };
+  }
+  
+  if ( !!lOptions.themetype ) {
+    if( lOptions.themetype == 'themeroller' ) {
       lTreeConfig.plugins.push("themeroller");
-    }else if(lOptions.themetype == 'themes'){
+    } else if ( lOptions.themetype == 'themes' ) {
       lTreeConfig.plugins.push("themes");
       
       var lThemeConfig = {"themes": {"theme":lOptions.theme,"url":lOptions.themeurl}};
@@ -87,25 +122,25 @@ function init_tree_custom(pOptions){
     };
   };
 
-  if(!!lOptions.initOpen){
+  if ( !!lOptions.initOpen ) {
     lTreeConfig.core.initially_open = lOptions.initOpen;
   };
   
-  if(!!lOptions.initSelect){
+  if ( !!lOptions.initSelect ) {
     lTreeConfig.ui.initially_select = lOptions.initSelect;
   };
   
-  if(!!lOptions.initLoaded){
+  if ( !!lOptions.initLoaded ) {
     lTreeConfig.core.initially_load = lOptions.initLoaded;
   };
   
-  if(!!lOptions.initData){
+  if ( !!lOptions.initData ) {
     $.extend(lTreeConfig.json_data,
     { "data" : lOptions.initData }
     );
   };
   
-  if(lOptions.ajaxSearch){
+  if ( lOptions.ajaxSearch ) {
     $.extend(lTreeConfig.search, 
       {
         "ajax" : {

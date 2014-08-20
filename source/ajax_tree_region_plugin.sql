@@ -442,6 +442,10 @@ IS
   l_std_theme           VARCHAR2(50)    := p_plugin.attribute_04;
   l_cst_theme_path      VARCHAR2(250)   := p_plugin.attribute_05;
   l_cst_theme_file      VARCHAR2(100)   := p_plugin.attribute_07;
+  
+  --plugin options
+  l_plugins             VARCHAR2(500)   := p_region.attribute_13;
+  l_plugins_conf        VARCHAR2(4000)  := p_region.attribute_14;
 BEGIN
 
   APEX_PLUGIN_UTIL.DEBUG_REGION ( 
@@ -579,7 +583,7 @@ BEGIN
         '#ct_'||l_region_id||' ins{background-color: transparent;} ' ||
         'div.jstree li > a.jstree-search{background: #CCCCCC;} ' ||
         '.jstree li,  ' ||
-        'div.jstree li > ins.jstree-icon ' ||
+        'div.jstree li > ins.jstree-icon, div.jstree li > a > ins.jstree-checkbox ' ||
         ' { background-image:url("'||l_file_prefix||'tree_icon_map-default.png"); background-repeat:no-repeat; background-color:transparent; } ' ||
         '.jstree li { background-position:-90px 0; background-repeat:repeat-y; } ' ||
         '.jstree li.jstree-last { background:transparent; } ' ||
@@ -650,6 +654,12 @@ BEGIN
     END CASE;
   END IF;
   
+  apex_css.add_file (
+    p_name      => 'style-all',
+    p_directory => p_plugin.file_prefix,
+    p_version   => NULL
+  );
+  
   -- Javascript initialization
   -- TODO: create jquery wrapper and pass options in an options object instead of literals
   apex_javascript.add_onload_code (
@@ -665,6 +675,8 @@ BEGIN
       ||   ', "themetype" : "'    || CASE l_theme_type WHEN 'STANDARD' THEN 'themes' ELSE 'themeroller' END ||'"'
       ||   ', "theme" : "'        || LOWER(l_std_theme) ||'"'
       ||   ', "themeurl" : "'     || p_plugin.file_prefix || 'style-' || LOWER(l_std_theme) ||'.css"'
+      ||   ', "plugins" : '       || NVL(l_plugins, '[]')
+      ||   ', "pluginsConf" : '   || NVL(l_plugins_conf, 'null')
       || '});'
   );
   
